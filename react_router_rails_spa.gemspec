@@ -8,7 +8,7 @@ Gem::Specification.new do |spec|
   spec.authors = ["Naofumi Kagami"]
   spec.email = ["naofumi@mac.com"]
 
-  spec.summary = "Use React Router v7 framework on your Rails-powered SPA."
+  spec.summary = "Integrate React Router v7 SPA framework with your Ruby on Rails backend."
   spec.homepage = "https://github.com/naofumi/react_router_rails_spa"
   spec.license = "MIT"
   spec.required_ruby_version = ">= 3.0.0"
