@@ -4,12 +4,12 @@ namespace :react do
   desc "Build the React application"
   task :build do
     puts "Building React Router v7 app..."
-    system("cd frontend && npm install && npm run build")
+    `cd frontend && npm run build`
 
-    puts "Moving build files to public/react-router..."
-    system("rm -rf public/react-router/*")
-    system("mv frontend/dist/* public/react-router/")
-    system("mv public/react-router/index.html public/react-router/react-router-index.html")
+    puts "Moving build files to public/react..."
+    `rm -rf public/react`
+    `mv frontend/build/client public/react`
+    `mv public/react/index.html public/react/react-router-rails-spa-index.html`
 
     puts "✅ React app successfully built and deployed!"
   end
@@ -56,7 +56,7 @@ namespace :react_router do
   # Running bin/rails assets:precompile will also run this task.
   #
   # bin/rails react_router:build
-  desc "Build React Router App"
+  desc "Build React Router App and move to the public folder"
   task build: [:npm_install] do
     Dir.chdir("#{Dir.pwd}/frontend") do
       puts "Building React Router v7 app..."

@@ -2,11 +2,10 @@ import type { Config } from "@react-router/dev/config";
 
 export default {
   // Config options...
-  // For our React Router app, we will turn off Server-side render
-  // use SPA mode!!
+  // For our React Router app, we will turn off Server-side render and use SPA mode.
   ssr: false,
-  // In the above, we have decided to serve the React Router app from "/react-router/".
-  // The basename options tell React Router to manage this when generating
+  // We serve the React Router app from the "/react/" path.
+  // The basename option tells React Router to manage this when generating
   // Link tags, for example.
-  basename: "/react-router/"
+  basename: "/react/"
 } satisfies Config;
