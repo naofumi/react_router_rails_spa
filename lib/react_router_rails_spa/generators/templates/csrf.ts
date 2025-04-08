@@ -36,6 +36,10 @@
 *      }
 *    )
 *
+* Note that Axios has a feature that automatically does this for you.
+* Read the XSRF configuration comments on the linked page.
+* https://axios-http.com/docs/req_config
+*
 * */
 
 export function getCSRFToken() {
