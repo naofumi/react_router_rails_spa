@@ -1,38 +1,42 @@
 ## React Router SPA Framework mode integration for Ruby on Rails
 
-Integrate [React Router in SPA Framework mode](https://reactrouter.com/how-to/spa) into your Ruby on Rails application
-and deploy as static assets from your Rails `public` folder.
-Benefit from the integrated client-side router, loader data-fetching pattern,
+The react_router_rails_spa gem integrates [React Router in SPA Framework mode](https://reactrouter.com/how-to/spa) with your Ruby on Rails application.
+The React app is built as static assets in your Rails `public` folder.
+It can be deployed on your current production server with minimal, if any, configuration changes.
+
+Benefit from state-of-the-art React SPA technlologies –
+the integrated client-side router, loader data-fetching pattern,
 automatic code-splitting, and development server with HMR,
 without the costs and complexities of running a separate front-end server.
 
-If you are using Next.js, not because you need to prioritize SEO,
-but mainly for convenience,
-if you are not using SSR but predominantly fetching data on the client-side,
-then this gem may provide you with a simpler, cheaper and more performant solution.
+If you are using Next.js, not for SEO
+but only for convenience,
+if you are not using SSR but fetching data on the client-side,
+then this gem will provide you with a similarly convenient but simpler, cheaper and more performant solution.
 
-You may be considering the traditional approaches to React and Rails integration such as [Webpacker](https://github.com/rails/webpacker),
+ You may be considering the traditional approaches to React and Rails integration such as [Webpacker](https://github.com/rails/webpacker),
 [jsbundling-rails](https://github.com/rails/jsbundling-rails), [Vite Ruby](https://github.com/ElMassimo/vite_ruby)
-but concerned about installing and configuring additional packages, and avoiding common SPA pitfalls.
-The React Router SPA framework mode in this gem includes the router, reduces your bundle size through automatic per-route code-splitting,
-and eliminates data-fetch waterfalls through the loader data-fetch pattern.
-
-The generator in this gem will install React Router and [configure it for an SPA as a framework](https://reactrouter.com/how-to/spa).
+but concerned about installing and configuring additional packages, and avoiding SPA pitfalls.
+The opinionated React Router SPA framework in this gem is "Omakase" and includes all that you need – an integrated router, automatic per-route code-splitting, and the loader data-fetch pattern to eliminate data-fetch waterfalls.
 
 ## Who is it for?
 
-- You want to use integrate React into a Ruby on Rails application.
-  - The Ruby on Rails application may already have ERB (Hotwire) pages.
+Consider trying out this gem if any of the following rings true.
+
+- You want to integrate React into a Ruby on Rails application.
+  - You want an out-of-the-box solution for a multipage React application.
+  - Your Ruby on Rails application already has ERB (Hotwire)  pages.
 - You do not need SEO for the React generated pages (you don't need SSR/SSG).
-  - You can always use ERB views when SEO is a priority.
-- You do not want to host your frontend on a separate server due to costs, complexity, and authentication concerns.
-  - You want to simply deploy your React frontend as static assets inside your Ruby on Rails `public` folder.
+  - You can always use ERB views for the pages that neww SEO.
+- You do not want to host multiple servers for your frontend and your backend.
+  - You do not want to incur the additional costs, complexity, and authentication concerns that are inherent when dealing with multiple servers.
+  - You want to simply deploy your React frontend as static assets on a single server, inside your Ruby on Rails `public` folder.
 - You have many pages, and you want to reduce the initial JavaScript payload size by using automatic code-splitting and lazy-loading, but without sacrificing performance due to request waterfalls.
 
 ## Installation
 
-We assume that you have an existing Ruby on Rails application,
-and you will to create a new React Router frontend inside the `frontend` directory.
+We assume that you have an existing Ruby on Rails application.
+The React Router application will be installed inside the `frontend` directory.
 
 Add this line to your application's Gemfile:
 
@@ -48,11 +52,14 @@ bin/rails generate react_router_rails_spa:install
 ```
 
 This will create a new directory called `frontend` inside the project root.
-It will also create a React bootstrap endpoint `/react` handled by `ReactController#show`,
-rake tasks for starting the dev server and building the React app.
-It also adds `include ReactRouterRailsSpa::CsrfCookieEnabled` to your `ApplicationController` to allow you to use the robust CSRF protection built into Ruby on Rails from your React application.
+It will also create a React bootstrap endpoint for all paths starting with `/react`.
+The endpoint will be handled by `ReactController#show`.
 
-## Running in Development
+You will also have rake tasks for starting the dev server and building/previewing the React app.
+
+As part of the integration, we provide utilities for using the robust CSRF protection built into Ruby on Rails from your React application.
+
+## Running the React Router development server
 
 Start the Ruby on Rails server (either `bin/rails s` or `bin/dev`) and then run the following command to start the React Router development server.
 
@@ -64,10 +71,9 @@ Access the development server from the URL outputted from this command (Typicall
 
 The development server gives you HMR and is helpful when editing pages generated by the React app. However,
 there are significant differences compared to the production environment,
-especially with regard to how the React pages interact with Ruby on Rails.
+especially with regard to how the React pages interacts with Ruby on Rails.
 
-You should always assume that the development server is only an approximation.
-You are advised to build the React app and access it from the Ruby on Rails server to ensure that it works as intended. 
+You should always assume that the development server is only an approximation, and you are advised to build/preview the React app and test it from the Ruby on Rails server to ensure that it works as intended. 
 
 Run the following command to build the React app. The React page will be available from the Ruby on Rails server
 and will represent what you will see in production.
@@ -77,14 +83,22 @@ and will represent what you will see in production.
 bin/rails react_router:build
 ```
 
+This is also aliased as the following:
+
+```shell
+bin/rails react_router:build
+```
+
+
 ## Deployment
 
 This gem integrates with the Ruby on Rails Asset pipeline.
+
 The React Router application is automatically built whenever `bin/rails assets:precompile` is run
-and no changes should be required if your Ruby on Rails application already does this.
+and therefore no changes should be required since your Ruby on Rails application should already do this.
 
 If your deployment pipeline does not already install Node (for example, you have a "no-build" deployment for Rails),
-then install it in your build environment since building the React Router application will require it.
+then install it in your CI/CD environment since building the React Router application will require it.
 
 ## Background
 
@@ -118,7 +132,22 @@ This is served through an ActionController endpoint,
 enabling you to use cookies to send session-specific information on the first HTML load
 and is used in this gem to send CSRF tokens.
 
-## 
+## Notes when using Rails in API mode
+
+Ruby on Rails provides an API mode that removes many frontend features.
+Importantly, API mode implies a stateless API server that does not support cookies.
+It removes the middleware for cookie handling and also for CSRF protection.
+
+This is important.
+
+I have seen projects that started out in API mode but afterward decided to provide stateful authentication with cookies.
+Unfortunately, they restored cookie handling but forget to do the same for CSRF protection.
+This resulted in an API server that was vulnerable to CSRF attacks.
+
+The react_router_rails_spa gem assumes that you want simple and secure authentication that can be shared with ERB pages – stateful cookie-based authentication.
+You are recommended to not use the Rails API mode.
+
+If you wish to restore cookie support to a pre-existing Rails application, make sure that you also restore CSRF protection. 
 
 ## Contributing
 

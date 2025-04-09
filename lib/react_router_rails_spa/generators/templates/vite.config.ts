@@ -18,8 +18,8 @@ export default defineConfig({
 
   // These are settings for the dev server.
   server: {
-    // In production, the API server (Rails) and the assets
-    // will be served from the same port number (typically 80).
+    // In production and preview mode, the API server (Rails) and the assets
+    // will be served from the same port number (typically 80 for production and 3000 for preview).
     //
     // However, when using the vite development server, assets will be served from port 5173,
     // and the API server will be on port 3000 (Rails default).

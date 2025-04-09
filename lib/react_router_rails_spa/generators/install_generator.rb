@@ -46,11 +46,11 @@ module ReactRouterRailsSpa
           # * We can use the index.html file that React Router generates using SSG,
           #   from the `frontend-react-router/app/root.tsx` file.
           #   This file contains optimizations that would be challenging to recreate inside Rails using ERB templates.
-          # * By going through the Rails controller, we can adjust cache and cookie headers to
+          # * By going through the Rails controller, we can adjust the cache and cookie headers to
           #   improve performance, reliability, and integration with Rails.
           #
           # The included ReactRouterRailsSpa::CsrfCookieEnabled module will 
-          # also send the CSRF token inside the "X-CSRF-Token" cookie for use inside your React app.
+          # send the CSRF token inside the "X-CSRF-Token" cookie for use inside your React app.
           class ReactController < ApplicationController
             include ReactRouterRailsSpa::CsrfCookieEnabled
 
