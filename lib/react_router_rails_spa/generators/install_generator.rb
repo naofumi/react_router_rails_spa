@@ -48,21 +48,16 @@ module ReactRouterRailsSpa
           #   This file contains optimizations that would be challenging to recreate inside Rails using ERB templates.
           # * By going through the Rails controller, we can adjust cache and cookie headers to
           #   improve performance, reliability, and integration with Rails.
+          #
+          # The included ReactRouterRailsSpa::CsrfCookieEnabled module will 
+          # also send the CSRF token inside the "X-CSRF-Token" cookie for use inside your React app.
           class ReactController < ApplicationController
+            include ReactRouterRailsSpa::CsrfCookieEnabled
+
             def show
               render file: Rails.public_path.join("react/react-router-rails-spa-index.html"), layout: false
             end
           end
-        RUBY
-      end
-
-      def add_csrf_to_application_controller
-        template "csrf_cookie_enabled.rb", "app/controllers/concerns/csrf_cookie_enabled.rb"
-
-        say "Adding CSRF protection to the ApplicationController ..."
-        inject_into_class "app/controllers/application_controller.rb", ApplicationController, <<~RUBY
-          # This will send the CSRF token inside the "X-CSRF-Token" cookie for use inside your React app.
-          include ReactRouterRailsSpa::CsrfCookieEnabled
         RUBY
       end
 
