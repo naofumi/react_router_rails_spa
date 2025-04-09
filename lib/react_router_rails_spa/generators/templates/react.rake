@@ -1,20 +1,5 @@
 # frozen_string_literal: true
 
-namespace :react do
-  desc "Build the React application"
-  task :build do
-    puts "Building React Router v7 app..."
-    `cd frontend && npm run build`
-
-    puts "Moving build files to public/react..."
-    `rm -rf public/react`
-    `mv frontend/build/client public/react`
-    `mv public/react/index.html public/react/react-router-rails-spa-index.html`
-
-    puts "✅ React app successfully built and deployed!"
-  end
-end
-
 namespace :react_router do
   # For convenience, npm packages do not have to be explicitly installed.
   # Installed will be automatically initiated by other tasks.
@@ -32,9 +17,9 @@ namespace :react_router do
   # this task in the Procfile.
   #
   # bin/rails react_router:dev
-  desc "Start React Router Dev Server"
+  desc "Start React Router Development Server with Hot Module Reloading"
   task dev: [:npm_install] do
-    puts "Starting React Router v7 app dev server..."
+    puts "Starting React Router v7 app development server..."
     Dir.chdir("#{Dir.pwd}/frontend") do
       system("npm", "run", "dev")
     end
@@ -58,18 +43,23 @@ namespace :react_router do
   # bin/rails react_router:build
   desc "Build React Router App and move to the public folder"
   task build: [:npm_install] do
-    Dir.chdir("#{Dir.pwd}/frontend") do
-      puts "Building React Router v7 app..."
-      system("npm", "run", "build")
+    puts "Building React Router v7 app..."
+    `cd frontend && npm run build`
 
-      puts "Moving build files to public/react..."
-      system("rm -rf public/react/*")
-      system("mv frontend/build/client public/react")
-      system("mv public/react/index.html public/react/react-router-rails-spa-index.html")
+    puts "Moving build files to public/react..."
+    `rm -rf public/react`
+    `mv frontend/build/client public/react`
+    `mv public/react/index.html public/react/react-router-rails-spa-index.html`
 
-      puts "✅ React app successfully built and deployed!"
-    end
+    puts "✅ React app successfully built and deployed!"
   end
+
+  # Run bin/rails react_router:preview to create a preview build.
+  #
+  # This is identical to running bin/rails react_router: build
+  # and is provided solely to align better with intent.
+  desc "Preview your React Router App from the Rails development server (typically port 3000)"
+  task preview: [:build]
 
   # Run bin/rails react_router:clobber to remove the build files.
   # Running bin/rails assets:clobber will also run this task.
