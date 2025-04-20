@@ -61,7 +61,7 @@ const resources = [
     text: "Read the README for the react_router_rails_spa gem",
   },
   {
-    href: "https://github.com/naofumi/react_router_rails_spa/documentation/introduction.md",
+    href: "https://github.com/naofumi/react_router_rails_spa/blob/main/documents/introduction.md",
     text: "Read the Introduction for the react_router_rails_spa gem",
   },
   {
@@ -69,7 +69,7 @@ const resources = [
     text: "Read the React Router Docs",
   },
   {
-    href: "https://reactrouter.com/docs",
+    href: "https://rubyonrails.org/",
     text: "Read the Ruby on Rails Docs",
   },
 ];

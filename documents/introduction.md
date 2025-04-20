@@ -2,9 +2,18 @@
 
 ## TL;DR;
 
-This article describes the [react_router_rails_spa gem](https://github.com/naofumi/react_router_rails_spa), which allows you to integrate a React Router SPA framework application into you existing Ruby on Rails project.
+Integrating React onto a Ruby on Rails application is unnecessarily challenging.
+Why do we have to install jsbundling-rails, install multiple packages, configure propshaft, create an ERB endpoint, etc.? 
+Why can't we just run `rails new`, install a single gem and instantly have a state-of-the-art React setup?
+
+This article introduces the [react_router_rails_spa gem](https://github.com/naofumi/react_router_rails_spa),
+which allows you to integrate a React Router SPA framework application into your existing Ruby on Rails project.
+It aims
+to be an ["omakase"](https://dhh.dk/2012/rails-is-omakase.html) Rails setup
+that rivals Next.js for getting up to speed fast.
 
 To jump to the installation steps, go to the "Steps to Integrate React Router into your Rails Application" section.
+Installation is quite simple.
 
 ## Who is this for?
 
@@ -13,13 +22,13 @@ The react_router_rails_spa gem was designed for the following situations.
 ### You want to create a web application with a React frontend and a Rails backend.
 
 * You want a simple setup that is ["omakase"](https://dhh.dk/2012/rails-is-omakase.html). You don't want to install packages and configure them on the React side. You don't want to manually add routes and controllers on the Rails side. Everything should be a single gem and a single command.
-* You want something that is easy to deploy, and cost-effective. You don't want to worry about server charges.
+* You want something that is easy to deploy, and cost-effective. You don't want to worry about being charged for the extra server.
 * You don't need SEO for the React pages. 
 * If SEO is necessary, you can just serve ERB pages or static HTML files. 
 
 ### You are considering Next.js, but you do not need SSR nor RSCs. You are only considering Next.js because it is easy to set up.
 
-* You're only using Next.js because you thought it was ["omakase"](https://dhh.dk/2012/rails-is-omakase.html). You actually found Rails integration harder than you bargained for.
+* You're only using Next.js because you thought it was ["omakase"](https://dhh.dk/2012/rails-is-omakase.html). It was at least extremely easy to set up on your local machine. Now you've found that Rails integration is harder than you bargained for, especially around authentication schemes and production deployment, domains and CORS settings, etc. You want something simpler from `rails new` to `kamal deploy`.
 * You are worried about deployment. Specifically, you are not happy with Vercel pricing or the extra cost of an additional AWS ECS instance to host Next.js.
 
 The react_router_rails_spa gem satisfies the above requirements and more.
@@ -34,10 +43,20 @@ It will give you an ["omakase"](https://dhh.dk/2012/rails-is-omakase.html) Moder
 
 ### You want to embedd some React components on top of your ERB-rendered pages
 
-This is [the original way that React was used](https://react.dev/learn/add-react-to-an-existing-project#using-react-for-a-part-of-your-existing-page).
+This was [the original way that React was used](https://react.dev/learn/add-react-to-an-existing-project#using-react-for-a-part-of-your-existing-page).
+React was built for this, and it's generally much simpler to set up than a multi-page SPA.
+The current gem does not help you with this.
 If you wish to take this approach,
 you can build your own system or use Gems like [react-rails](https://github.com/reactjs/react-rails) and  [turbo-mount](https://github.com/skryukov/turbo-mount).
-Turbo Mount uses Stimulus to mount components, and is therefore more robust if you are using Hotwire in your ERB views.
+Turbo Mount uses Stimulus to mount components, and is more robust if you are using Hotwire in your ERB views.
+
+## How does this compare to [...]?
+
+Compared to gems like [React on Rails](https://github.com/shakacode/react_on_rails) or [Intertia Rails](https://inertia-rails.dev/),
+the current gem is just an installer and does virtually nothing to modify or add features to React Router,
+the de-facto standard router library for React.
+This ensures that frontend developers will feel right at home.
+It also means that you can easily understand how it works, and can customize accordingly.
 
 ## Background
 
@@ -126,7 +145,10 @@ This is how the react_router_rails_spa gem works.
 It is important to note that the [react_router_rails_spa gem](https://github.com/naofumi/react_router_rails_spa) does nothing more than a stock React Router installation with some custom configuration,
 paired with the generation of a single Rails controller.
 
-There is very little custom code, and you can easily update your NPM packages independently of this gem. The generated code is also heavily commented to help you understand the internals for yourself.
+**There is very little custom code, and this is actually a huge advantage**.
+This is a very thin wrapper around the official React Router installer and resilient against future changes.
+If you wish, you can easily update and customize your NPM packages independently of this gem. The generated code is also heavily commented
+to help you understand the internals for yourself.
 
 ### React Router
 
@@ -170,7 +192,7 @@ but this can be customized in the controller.
 Another way to look at this integration is like this;
 
 * The traditional approach taken by webpack, esbuild and vite-rails, is to communicate between the React application and Rails via a Rails generated ERB bootstrap HTML. For example, Rails-generated CSRF tokens were provided as `meta` tags embedded in HTML.
-* The current approach is to use the React Router generated bootstrap HTML and to add Rails integration through HTTP headers (including cookies) only. That's why this gem sends Rails-generated CSRF tokens to the React application using cookies.
+* The current approach is to use the React Router generated bootstrap HTML and to add Rails integration through HTTP headers (including cookies) only. Rails doesn't touch this file and leaves it as is. That's why this gem sends Rails-generated CSRF tokens to the React application using cookies – we don't want to modify the HTML itself.
 
 ### Rake files for automation
 
@@ -211,7 +233,7 @@ bin/rails react_router:preview
 
 ## Demo and Source code
 
-* I have a [demo application based on the current proposal running on Kamal on a VPS server](https://rrrails.castle104.com/react-router/). It has simple, session-based authentication and basic CRUD. Mutations are secured by integration with Rails CSRF protection.
+* I have a [demo application running on Kamal on a VPS server](https://rrrails.castle104.com/react/). It has simple, session-based authentication and basic CRUD. Mutations are secured by integration with Rails CSRF protection.
 * In the demo application, I have intentionally added a 0.5 to 1.5-second delay on all server requests. Even the most bloated and inefficient web technologies will look great on a high-performance device with a fast network. Unless your demo intentionally simulates non-ideal situations, it is meaningless.
 * The source-code for this demo application is [available on GitHub](https://github.com/naofumi/react-router-vite-rails).
 
@@ -227,8 +249,16 @@ This gem works with a pre-existing installation of Rails. Create a new Rails app
 rails new [project name]
 ```
 
-Note that this gem works even with a no-build Rails setup (which is the Rails default),
-but you will need Node on your machine to install React Router.
+Note that this gem works even with a no-build Rails setup (which is the Rails default).
+However, you will need Node.js in your CI/CD for deployment.
+If you are unsure how to do this,
+we recommend that you generate a new Rails application with jsbundling-rails pre-installed.
+This will create a ready-made Dockerfile that installs Node.js.
+(This gem won't use esbuild. We're only doing this for Node.js.)
+
+```shell
+rails new [project name] --javascript esbuild
+```
 
 ### Install the `react_router_rails_spa` gem
 
