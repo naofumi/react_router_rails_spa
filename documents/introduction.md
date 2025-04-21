@@ -3,48 +3,49 @@
 ## TL;DR;
 
 Integrating React onto a Ruby on Rails application is unnecessarily challenging.
-Why do we have to install jsbundling-rails, install multiple packages, configure propshaft, create an ERB endpoint, etc.? 
+We have to install jsbundling-rails, install multiple packages, configure propshaft, create an ERB endpoint, etc.
+
 Why can't we just run `rails new`, install a single gem and instantly have a state-of-the-art React setup?
 
 This article introduces the [react_router_rails_spa gem](https://github.com/naofumi/react_router_rails_spa),
-which allows you to integrate a React Router SPA framework application into your existing Ruby on Rails project.
-It aims
-to be an ["omakase"](https://dhh.dk/2012/rails-is-omakase.html) Rails setup
-that rivals Next.js for getting up to speed fast.
+which integrates a React Router SPA framework application into your existing Ruby on Rails project.
+With just a few commands, you will have a fully functioning scaffold on which to build your React app.
 
-To jump to the installation steps, go to the "Steps to Integrate React Router into your Rails Application" section.
-Installation is quite simple.
+To jump to the installation steps, go to the ["Using the gem" section](#using-the-gem).
 
 ## Who is this for?
 
-The react_router_rails_spa gem was designed for the following situations.
+If any of the following describes yourself, then this gem might be for you.
 
-### You want to create a web application with a React frontend and a Rails backend.
+### You want to create an SPA with a React frontend and a Rails backend.
 
 * You want a simple setup that is ["omakase"](https://dhh.dk/2012/rails-is-omakase.html). You don't want to install packages and configure them on the React side. You don't want to manually add routes and controllers on the Rails side. Everything should be a single gem and a single command.
-* You want something that is easy to deploy, and cost-effective. You don't want to worry about being charged for the extra server.
+* You want something that is easy to deploy, and cost-effective. You don't want to pay for an extra server that you don't strictly need.
 * You don't need SEO for the React pages. 
 * If SEO is necessary, you can just serve ERB pages or static HTML files. 
 
-### You are considering Next.js, but you do not need SSR nor RSCs. You are only considering Next.js because it is easy to set up.
+### You tried Next.js, but you did not need SSR nor RSCs. You were only interested in Next.js because you thought it was easy.
 
-* You're only using Next.js because you thought it was ["omakase"](https://dhh.dk/2012/rails-is-omakase.html). It was at least extremely easy to set up on your local machine. Now you've found that Rails integration is harder than you bargained for, especially around authentication schemes and production deployment, domains and CORS settings, etc. You want something simpler from `rails new` to `kamal deploy`.
-* You are worried about deployment. Specifically, you are not happy with Vercel pricing or the extra cost of an additional AWS ECS instance to host Next.js.
+* You're only using Next.js because you thought it was ["omakase"](https://dhh.dk/2012/rails-is-omakase.html) and simple to set up.
+* After a while, you've found that integrating the Next.js server and the Rails server is harder than you bargained for. You've had headaches around authentication schemes, cross-domains, subdomains, CORS settings, samesite cookies, CSRF mitigation, and reverse proxies, etc. You've realized that running separate frontend and backend servers is hard.
+* You are not happy with the extra cost you pay to Next.js.
 
-The react_router_rails_spa gem satisfies the above requirements and more.
-It will give you an ["omakase"](https://dhh.dk/2012/rails-is-omakase.html) Modern React SPA with a single command.
+The react_router_rails_spa gem gives you true simplicity.
+A Modern React SPA with essential libraries included,
+which will run on a single server with a single gem – no multiserver headaches.
 
-### You want to use React because you believe you can create better UIs
+### You want to use cutting-edge React
 
-* You're using React because you think you can create a better UI/UX compared to Hotwire (I actually think that this is untrue and Hotwire can create great UI/UXs, but that's a different discussion)
-* You want to use cutting-edge React capabilities like code-splitting, loader-based data fetching and more. You don't want to create a slow, bloated, legacy React app.
+* You want to use cutting-edge React capabilities like code-splitting, loader-based data fetching and more, but you're not sure how to [set this up from scratch](https://react.dev/learn/build-a-react-app-from-scratch).
+* You don't want to create a slow, bloated, legacy React app.
 
 ## Who is this NOT for?
 
 ### You want to embedd some React components on top of your ERB-rendered pages
 
-This was [the original way that React was used](https://react.dev/learn/add-react-to-an-existing-project#using-react-for-a-part-of-your-existing-page).
+This is [how React was originally used](https://react.dev/learn/add-react-to-an-existing-project#using-react-for-a-part-of-your-existing-page).
 React was built for this, and it's generally much simpler to set up than a multi-page SPA.
+
 The current gem does not help you with this.
 If you wish to take this approach,
 you can build your own system or use Gems like [react-rails](https://github.com/reactjs/react-rails) and  [turbo-mount](https://github.com/skryukov/turbo-mount).
@@ -53,9 +54,9 @@ Turbo Mount uses Stimulus to mount components, and is more robust if you are usi
 ## How does this compare to [...]?
 
 Compared to gems like [React on Rails](https://github.com/shakacode/react_on_rails) or [Intertia Rails](https://inertia-rails.dev/),
-the current gem is just an installer and does virtually nothing to modify or add features to React Router,
-the de-facto standard router library for React.
-This ensures that frontend developers will feel right at home.
+the current gem is just an installer and does virtually nothing to modify or add features to React Router.
+This is a great advantage and ensures that frontend developers will feel right at home.
+
 It also means that you can easily understand how it works, and can customize accordingly.
 
 ## Background
@@ -69,9 +70,9 @@ Importantly, and often lost in the public discourse, they were **NOT** recommend
 Instead, they were advocating for creating SPAs with [**SPA** frameworks](https://react.dev/blog/2025/02/14/sunsetting-create-react-app#how-to-migrate-to-a-framework)
 that could be deployed on a CDN, a static hosting service, or the `public` folder of a Ruby on Rails application.
 
-In the following, I will call SPAs built with an SPA framework, **"Modern React SPAs"**
+In the following, we will call SPAs built with an SPA framework, **"Modern React SPAs"**
 to highlight that this is the current officially recommended approach.
-To contrast, I will call the ones that the React team is actively discouraging, **"Legacy React SPAs"**.
+To contrast, we will call the ones that the React team is actively discouraging, **"Legacy React SPAs"**.
 
 > **"I have no interest nor use for SSR!
 I don't need SEO.
@@ -98,7 +99,7 @@ to tell us
 that we should not simply replace the deprecated Create React App with a newer but nonetheless still architecturally Legacy SPA.
 Instead, they strongly urge us to embrace Modern React SPAs and avoid these issues.
 
-I should note that Vite is essentially a bundler and a development server, with a plugin system that allows us to easily install various packages.
+We should note that Vite is essentially a bundler and a development server, with a plugin system that allows us to easily install various packages.
 It is agnostic to the Legacy vs. Modern SPA debate.
 You can build a Legacy SPA using Vite, and you can also create a Modern SPA.
 Vite does not care either way, and the installer command `npm create vite@latest` gives you both templates.
@@ -112,9 +113,9 @@ The above solution is a Legacy SPA and will suffer from the same legacy issues.
 Instead, the React team is recommending that you integrate a Modern SPA framework using ...
 
 Well, actually, they don't have a concrete recommendation yet for Rails.
-As far as I know, nothing currently exists to easily integrate a Modern SPA with Rails.
+As far as we know, nothing currently exists to easily integrate a Modern SPA with Rails.
 
-I hope to address this with this [react_router_rails_spa gem](https://github.com/naofumi/react_router_rails_spa).
+We hope to address this with this [react_router_rails_spa gem](https://github.com/naofumi/react_router_rails_spa).
 
 ## Why we need a different approach for Rails integration
 
@@ -150,49 +151,36 @@ This is a very thin wrapper around the official React Router installer and resil
 If you wish, you can easily update and customize your NPM packages independently of this gem. The generated code is also heavily commented
 to help you understand the internals for yourself.
 
-### React Router
+### React Router SPA framework mode
 
-We install and use React Router in framework mode, [configured to generate an SPA build](https://reactrouter.com/how-to/spa).
-This will build static files that can be served from any static hosting provider, including the `public` folder in Rails.
+We install and use React Router in SPA framework mode, [configured to generate an SPA build](https://reactrouter.com/how-to/spa).
+It is a true SPA and will build static files that can be served from any static hosting provider.
+These are transferred to the `public` folder in Rails for deployment.
 
-One of these static files is the bootstrap HTML template (the root `index.html` file).
-We change the name of this file so that it will not be directly served from the `public` folder.
+The command for building the react application is integrated into the `rake assets:precompile` command.
+Therefore, you do not need any additional configuration in your CI/CD scripts.
+
+### Integration with Ruby on Rails through cookies
+
+Previously, you would integrate Ruby on Rails using a bootstrap HTML template generated by Rails using ERB templates.
+This allowed you, for example, to embed CSRF-mitigation token tags.
+As mentioned above, this is incompatible with Modern SPA frameworks.
+
+Otherwise,
+you could build your SPA independently of Rails
+and send extra requests from the browser to retrieve the CSRF token and other integration information.
+This requires otherwise unnecessary network requests.
+
+Neither approach is ideal.
+
 Instead,
-we use a dedicated Rails controller to add Rails-generated HTTP headers and cookies
-and serve the file as the response body.
+the [react_router_rails_spa gem](https://github.com/naofumi/react_router_rails_spa) sends Rails-generated cookies and/or headers alongside the SPA framework-generated bootstrap HTML file.
+It give you the best of both worlds.
 
-After building, these static files will be transferred to the Rails `public` folder from which they can be deployed like any other static asset.
-
-### Rails routes.rb and the ReactController
-
-We generate a `ReactController` that serves the bootstrap HTML template.
-The body of the response is the exact contents of the React Router-generated `index.html` file, but
-by passing it through the `ReactController`,
-we can customize the headers and add session-specific information as cookies.
-
-For example, `ReactController`
-includes  the `ReactRouterRailsSpa::CsrfCookieEnabled` module
-which sends session-specific CSRF tokens via cookies to integrate Rails'
+For example, the `ReactRouterRailsSpa::CsrfCookieEnabled` module
+sends session-specific CSRF tokens via cookies to integrate Rails'
 CSRF protection with React.
-
-`ReactController` will also add session cookies so that you can take advantage of session information from the bootstrap HTML file onwards.
-
-Finally, the `ReactController` allows you to set cache headers separately from assets served directly from the `assets` folder.
-
-Rails uses the [ActionDispatch::Static middleware](https://api.rubyonrails.org/classes/ActionDispatch/Static.html)
-to serve assets from the `public` folder,
-and this sets the HTTP caching headers aggressively to allow extensive caching for long periods of time.
-While this is great for JavaScript, CSS and image assets,
-this is usually undesirable for HTML files since we cannot attach cache-busting digests to them.
-Serving the bootstrap HTML template through `ReactController` allows us
-to easily change the cache headers to values that are suitable for HTML responses.
-Currently, the [react_router_rails_spa gem](https://github.com/naofumi/react_router_rails_spa) uses the same cache headers as other ERB files,
-but this can be customized in the controller. 
-
-Another way to look at this integration is like this;
-
-* The traditional approach taken by webpack, esbuild and vite-rails, is to communicate between the React application and Rails via a Rails generated ERB bootstrap HTML. For example, Rails-generated CSRF tokens were provided as `meta` tags embedded in HTML.
-* The current approach is to use the React Router generated bootstrap HTML and to add Rails integration through HTTP headers (including cookies) only. Rails doesn't touch this file and leaves it as is. That's why this gem sends Rails-generated CSRF tokens to the React application using cookies – we don't want to modify the HTML itself.
+The SPA framework-generated HTML is untouched.
 
 ### Rake files for automation
 
@@ -213,31 +201,13 @@ All other paths are handled by Rails.
 The current gem adds minor configurations for this.
 If you want a different setup, you can change the configurations.
 
-Note that configurations for the Vite development server are tricky.
-We have provided settings
-to compensate for the fact that the development server runs on port 5173 while the Rails application runs on port 3000.
-However, this will not allow you to test integration between Rails and React.
-
-* The React app runs on port 5173 while the ERB files are on port 3000. Links between the two will not work on the development server, even if they are fine in production.
-* The React app running on the development server will not bootstrap from the Ruby on Rails endpoint on the `ReactController#show` action. Instead, the development server will directly serve the React Router generated bootstrap HTML. This means that the bootstrap file will not contain Rails integrations. This is only an issue on the development server and not in production.
-
-As a solution, you can use the development server with HMR for small fixes, but for larger changes,
-you will need to use a "preview" build.
-You should also always check with a "preview" build before deploying to production.
-
-We provide a rake task for building a "preview".
-
-```shell
-bin/rails react_router:preview
-```
-
 ## Demo and Source code
 
-* I have a [demo application running on Kamal on a VPS server](https://rrrails.castle104.com/react/). It has simple, session-based authentication and basic CRUD. Mutations are secured by integration with Rails CSRF protection.
-* In the demo application, I have intentionally added a 0.5 to 1.5-second delay on all server requests. Even the most bloated and inefficient web technologies will look great on a high-performance device with a fast network. Unless your demo intentionally simulates non-ideal situations, it is meaningless.
+* We have a [demo application running on Kamal on a VPS server](https://rrrails.castle104.com/react/). It has simple, session-based authentication and basic CRUD. Mutations are secured by integration with Rails CSRF protection.
+* In the demo application, we have intentionally added a 0.5 to 1.5-second random delay on all server requests. Even the most bloated and inefficient web technologies will look great on a high-performance device with a fast network. Unless your demo intentionally simulates non-ideal situations, it is meaningless.
 * The source-code for this demo application is [available on GitHub](https://github.com/naofumi/react-router-vite-rails).
 
-The source code is heavily commented. I recommend that you read through it to understand the setup in more detail.
+The source code is heavily commented. We recommend that you read through it to understand the setup in more detail.
 
 ## Using the gem
 
@@ -287,7 +257,7 @@ and generate the routes and all the necessary files and configurations.
 
 ### Run the development server
 
-Run the following command to start the development server. This comes with HMR (Hot Module Replacement).
+Run the following command to start the frontend development server with HMR (Hot Module Replacement).
 
 ```shell
 bin/rails react_router:dev
@@ -295,7 +265,11 @@ bin/rails react_router:dev
 
 Point your browser to http://localhost:5173/react/ to see the welcome page.
 
-### Build the React Router application
+Note that the frontend development server will not truly represent
+how the React application and Rails server interact in production.
+It is important to test with the following preview command before deploying.
+
+### Preview and build the React Router application
 
 Run the following command to build the React Router application
 and store the static files into the Rails `public` directory.
@@ -304,17 +278,15 @@ and store the static files into the Rails `public` directory.
 bin/rails react_router:build
 ```
 
-Start your Rails application if it is not already running.
-
-Point your browser to http://localhost:3000/react/ to see the welcome page.
-
-This command is also aliased as `preview`.
+This command is also aliased as:
 
 ```shell
 bin/rails react_router:preview
 ```
 
-### Read the added code
+Start your Rails application if it is not already running and point your browser to http://localhost:3000/react/ to see the welcome page.
 
-I have added numerous comments to the code generated by this gem. Please read it to understand how the integration works.
+### Read the code
+
+We have added numerous comments to the code generated by this gem. Please read it to understand how the integration works.
 

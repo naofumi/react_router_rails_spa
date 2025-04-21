@@ -1,40 +1,34 @@
 ## React Router SPA Framework mode integration for Ruby on Rails
 
 The react_router_rails_spa gem integrates [React Router in SPA Framework mode](https://reactrouter.com/how-to/spa) with your Ruby on Rails application.
-The React app is built as static assets in your Rails `public` folder, and so it can be deployed on your current production server with minimal, if any, configuration changes.
 
-Benefit from state-of-the-art React SPA technlologies –
-the integrated client-side router, loader data-fetching pattern,
-automatic code-splitting, and development server with HMR,
-without the costs and complexities of running a separate front-end server.
+The React app is built as a static SPA.
+Static assets will be built in your Rails `public` folder,
+and will be deployed on your current production server with minimal, if any, configuration changes.
 
-If you are using Next.js, not for SEO
-but only for convenience,
-if you are not using SSR but fetching data on the client-side,
-then this gem will provide you with a similarly convenient but simpler, cheaper and more performant solution.
+With a single gem and a single command,
+this gem sets up all that you need in  ["Omakase"](https://dhh.dk/2012/rails-is-omakase.html)-style – An integrated client-side router,
+per-route code-splitting, the loader data-fetch pattern, Rails controllers and routes –
+All of this will be automatically set up for you.  
 
- You may be considering the traditional approaches to React and Rails integration such as [Webpacker](https://github.com/rails/webpacker),
-[jsbundling-rails](https://github.com/rails/jsbundling-rails), [Vite Ruby](https://github.com/ElMassimo/vite_ruby)
-but concerned about installing and configuring additional packages, and avoiding SPA pitfalls.
-With a single gem and a single command, this gem sets up all that you need in  "Omakase"-style – Rails route and controller setup, an integrated client-side router, automatic per-route code-splitting, and the loader data-fetch pattern to eliminate data-fetch waterfalls.
+[Read the introduction](https://github.com/naofumi/react_router_rails_spa/blob/main/documents/introduction.md) for more background: 
 
 ## Who is it for?
 
-Consider trying out this gem if you fit any of the following descriptions.
+Consider trying out this gem if any of the below apply to you.
 
-- You want to integrate React into a Ruby on Rails application.
-  - You want an out-of-the-box solution for a state-of-the-art multipage React application. You do not enjoy installing React, React Router, Tailwind, configuring code-splitting, and deciding the data-loading scheme that you will use throughout your application. You want "Omakase" on the front-end as well as your Rails back-end. 
-  - Your Ruby on Rails application already has ERB (Hotwire)  pages.
-- You do not need SEO for the React generated pages (you don't need SSR/SSG).
-  - You can always use ERB views for the pages that neww SEO.
-- You do not want to host multiple servers for your frontend and your backend.
-  - You do not want to incur the additional costs, complexity, and authentication concerns that are inherent when dealing with multiple servers.
+- You want an out-of-the-box solution. 
+  - You do not enjoy installing React, React Router, Tailwind, configuring code-splitting, and deciding the data-loading scheme that you will use throughout your application. You want ["Omakase"](https://dhh.dk/2012/rails-is-omakase.html) on the front-end as well as your Rails back-end. 
+- You do not need SEO, at least not for the React pages.
+  - You can always use ERB views for the pages that need SEO.
+- You are tired of managing multiple servers for your frontend and your backend.
+  - You do not want to incur the additional costs, complexity, and authentication concerns that are inherent when dealing with multiple servers, for no concrete benefit.
   - You want to simply deploy your React frontend as static assets on a single server, inside your Ruby on Rails `public` folder.
 - You have many pages, and you want to reduce the initial JavaScript payload size by using automatic code-splitting and lazy-loading, but without sacrificing performance due to request waterfalls.
 
 ## Installation
 
-The React Router application will be installed inside the `frontend` directory. We assume that you have an existing Ruby on Rails application.
+We assume that you already have an existing Ruby on Rails application.
 
 Add this line to your application's Gemfile:
 
@@ -46,48 +40,52 @@ Then, run:
 
 ```shell
 bundle install
+```
+
+followed by:
+
+```shell
 bin/rails generate react_router_rails_spa:install
 ```
 
 This will create a new directory called `frontend` inside the project root.
-It will also create a React bootstrap endpoint for all paths starting with `/react`.
+This is where your React application is.
+
+It will also create a React bootstrap endpoint in your Rails routes for all paths starting with `/react`.
 The endpoint will be handled by `ReactController#show`.
-
-You will also have rake tasks for starting the dev server and building/previewing the React app.
-
-As part of the integration, we provide utilities for using the robust CSRF protection built into Ruby on Rails from your React application.
 
 ## Running the React Router development server
 
-React Router is built with Vite and uses the Vite development server to provide a Hot Module Replacement (HMR) capability, that is very helpful for routing editing of pages.
-However, the development server is not used in production and will not widely represent the application's behavior in production.
-We therefore strongly recommend that you build the React Router assets into the `public` folder and preview it before deploying into production. 
+React Router is built with Vite and uses the Vite development server to provide a Hot Module Replacement (HMR) capability.
 
-Start the Vite development server with HMR with the following command (we assume that the Ruby on Rails server is already running (with either `bin/rails s` or `bin/dev`).
+Start the Vite development server with the following command
+(we assume that the Ruby on Rails server is already running (with either the `bin/rails s` or the `bin/dev` command).
 
 ```shell
 bin/rails react_router:dev
 ```
 
-Access the development server from the URL outputted from this command (Typically `http://localhost:5173/react`)
+Note that the development server will not fully represent the application's behavior in production.
+In particular, the development server is only partially integrated with Rails.
+We therefore strongly recommend that you build the React Router assets into the `public` folder and preview it before deploying into production.
 
 To preview the production build, run the following command.
 ```shell
 bin/rails react_router:preview
 ```
 
-This will build the React Router application into the Rails `public` folder, and the React Router application will be available from the Rails development server (puma) at `http://localhost:3000/react`.
-The preview will be representative of the production app's behavior.
+This will build the React Router application into the Rails `public` folder.
+The React Router application will be available from the Rails development server
+(puma) at `http://localhost:3000/react`.
+This preview will be representative of the production app's behavior with Rails integration.
 
 ## Deployment
 
-This gem integrates with the Ruby on Rails Asset pipeline.
-
-The React Router application is automatically built whenever `bin/rails assets:precompile` is run
-and therefore no changes should be required since your Ruby on Rails application should already do this.
+This gem integrates with the Ruby on Rails Asset pipeline, and the React application is automatically built whenever `bin/rails assets:precompile` is run.
+No changes are required on your deployment script, since your Ruby on Rails application should run this command.
 
 If your deployment pipeline does not already install Node (for example, you have a "no-build" deployment for Rails),
-then install it in your CI/CD environment since building the React Router application will require it.
+then install it in your CI/CD environment since building the React Router application will require it. 
 
 ## Background
 
@@ -128,6 +126,7 @@ Importantly, API mode implies a stateless API server that does not support cooki
 It removes the middleware for cookie handling and also for CSRF protection.
 
 To fully benefit from hosting your React app inside Rails' `public` folder, we recommend that you avoid API-mode and instead use cookies for authentication.
+
 If you want to convert your API-mode application to use cookies, make sure to also restore CSRF features.
 Otherwise, your app will be vulnerable to CSRF attacks.
 
