@@ -5,7 +5,9 @@
 Integrating React onto a Ruby on Rails application is unnecessarily challenging.
 We have to install jsbundling-rails, install multiple packages, configure propshaft, create an ERB endpoint, etc.
 
-Why can't we just run `rails new`, install a single gem and instantly have a state-of-the-art React setup?
+Why can't we just run `rails new`,
+install a single gem, and instantly have a state-of-the-art React setup with client-side routing,
+code-splitting, and effective data-loading patterns built-in?
 
 This article introduces the [react_router_rails_spa gem](https://github.com/naofumi/react_router_rails_spa),
 which integrates a React Router SPA framework application into your existing Ruby on Rails project.
@@ -19,20 +21,19 @@ If any of the following describes yourself, then this gem might be for you.
 
 ### You want to create an SPA with a React frontend and a Rails backend.
 
-* You want a simple setup that is ["omakase"](https://dhh.dk/2012/rails-is-omakase.html). You don't want to install packages and configure them on the React side. You don't want to manually add routes and controllers on the Rails side. Everything should be a single gem and a single command.
+* You want a simple setup that is ["omakase"](https://dhh.dk/2012/rails-is-omakase.html). You don't want to install packages and configure them on the React side. On the Rails side, you don't want to manually add routes and controllers. Everything should be a single gem and a single command.
 * You want something that is easy to deploy, and cost-effective. You don't want to pay for an extra server that you don't strictly need.
 * You don't need SEO for the React pages. 
 * If SEO is necessary, you can just serve ERB pages or static HTML files. 
 
-### You tried Next.js, but you did not need SSR nor RSCs. You were only interested in Next.js because you thought it was easy.
+### You tried Next.js, but you did not really need SSR nor RSCs. You were only interested in Next.js because you thought it was easy.
 
 * You're only using Next.js because you thought it was ["omakase"](https://dhh.dk/2012/rails-is-omakase.html) and simple to set up.
 * After a while, you've found that integrating the Next.js server and the Rails server is harder than you bargained for. You've had headaches around authentication schemes, cross-domains, subdomains, CORS settings, samesite cookies, CSRF mitigation, and reverse proxies, etc. You've realized that running separate frontend and backend servers is hard.
-* You are not happy with the extra cost you pay to Next.js.
+* You are not happy with the extra money you have to pay to Next.js.
 
-The react_router_rails_spa gem gives you true simplicity.
-A Modern React SPA with essential libraries included,
-which will run on a single server with a single gem – no multiserver headaches.
+The [react_router_rails_spa gem](https://github.com/naofumi/react_router_rails_spa) gives you the simplicity of an opinionated SPA framework,
+without the complexity of a mulit-server setup.
 
 ### You want to use cutting-edge React
 
@@ -57,7 +58,7 @@ Compared to gems like [React on Rails](https://github.com/shakacode/react_on_rai
 the current gem is just an installer and does virtually nothing to modify or add features to React Router.
 This is a great advantage and ensures that frontend developers will feel right at home.
 
-It also means that you can easily understand how it works, and can customize accordingly.
+It also means that you can easily understand how it works. You can customize accordingly.
 
 ## Background
 
