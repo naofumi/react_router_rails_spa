@@ -13,6 +13,11 @@ All of this will be automatically set up for you.
 
 [Read the introduction](https://github.com/naofumi/react_router_rails_spa/blob/main/documents/introduction.md) for more background: 
 
+## Usage example and demo website
+
+We have a [demo application deployed with Kamal](https://rrrails.castle104.com/).
+The [source code for the demo application](https://github.com/naofumi/react-router-vite-rails) is available on GitHub.
+
 ## Who is it for?
 
 Consider trying out this gem if any of the below apply to you.
