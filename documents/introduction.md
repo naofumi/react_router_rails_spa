@@ -2,7 +2,7 @@
 
 ## TL;DR;
 
-Integrating React onto a Ruby on Rails application is unnecessarily challenging. We have to install jsbundling-rails, install multiple packages, configure propshaft, create an ERB endpoint, etc.
+Integrating React onto a Ruby on Rails application is unnecessarily challenging. We have to install jsbundling-rails, multiple packages, configure propshaft, create an ERB endpoint, etc.
 
 Why can't we just run `rails new`, install a single gem, and instantly have a state-of-the-art React setup with client-side routing, code-splitting, and effective data-loading patterns built-in?
 
