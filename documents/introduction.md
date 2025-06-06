@@ -44,7 +44,7 @@ The current gem does not help you with this however since it is designed for SPA
 
 ## How does this compare to [...]?
 
-Compared to gems like [React on Rails](https://github.com/shakacode/react_on_rails) or [Intertia Rails](https://inertia-rails.dev/), the current gem is just an installer and does virtually nothing to modify or add features to React Router. This is a great advantage and ensures that frontend developers will feel right at home.
+Compared to gems like [React on Rails](https://github.com/shakacode/react_on_rails) or [Inertia Rails](https://inertia-rails.dev/), the current gem is just an installer and does virtually nothing to modify or add features to React Router. This is a great advantage and ensures that frontend developers will feel right at home.
 
 It also means that you can easily understand how it works. You can customize accordingly.
 
