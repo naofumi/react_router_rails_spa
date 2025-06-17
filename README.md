@@ -50,7 +50,7 @@ bundle install
 followed by:
 
 ```shell
-bin/rails generate react_router_rails_spa:install
+bin/rails generate react_router_rails_spa:install --force
 ```
 
 This will create a new directory called `frontend` inside the project root.
