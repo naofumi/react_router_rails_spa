@@ -135,6 +135,17 @@ To fully benefit from hosting your React app inside Rails' `public` folder, we r
 If you want to convert your API-mode application to use cookies, make sure to also restore CSRF features.
 Otherwise, your app will be vulnerable to CSRF attacks.
 
+## Compared to other React – Ruby on Rails integrations
+
+There are many React - Rails integrations, and you may find it difficult to choose.
+I have provided some of my personal opinions below for informational purposes only.
+Note that this is not intended to be a comprehensive comparison.
+
+* In the blog post [Sunsetting Create React App](https://react.dev/blog/2025/02/14/sunsetting-create-react-app), the React team recommends that even when you are creating an SPA, you should use a framework. The react_router_rails_spa gem uses a framework since it builds upon React Router, which is one of those listed in the blog post.
+* None of the other gems, such as react-rails, webpacker/shakerpacker, jsbundling-rails, vite_rails, etc., can be considered to be a "framework" in the spirit of the blog post. These require augmentation with other libraries, which the React team describes in [Build a React app from Scratch](https://react.dev/learn/build-a-react-app-from-scratch).
+* Interia.js is an interesting project that may be considered to be a framework. Its defining characteristic is its close coupling with the backend. While this definitely has many benefits, the current gem's approach is more familiar to most React developers.
+* The react_router_rails_spa gem requires little to zero configuration because it tries to keep the integration interface tiny. 
+
 ## Contributing
 
 Bug reports and pull requests are welcome on GitHub at https://github.com/naofumi/react_router_rails_spa. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [code of conduct](https://github.com/naofumi/react_router_rails_spa/blob/main/CODE_OF_CONDUCT.md).
