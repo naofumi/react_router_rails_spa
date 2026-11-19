@@ -1,12 +1,17 @@
 import { reactRouter } from "@react-router/dev/vite";
 import tailwindcss from "@tailwindcss/vite";
 import { defineConfig } from "vite";
-import tsconfigPaths from "vite-tsconfig-paths";
 
 const railsEnv = process.env.RAILS_ENV || 'development'
 
 export default defineConfig({
-  plugins: [tailwindcss(), reactRouter(), tsconfigPaths()],
+  plugins: [tailwindcss(), reactRouter()],
+  // Prefer Vite's built-in tsconfig path resolution (available in Vite 6+)
+  // over the separate vite-tsconfig-paths package, matching current
+  // create-react-router templates.
+  resolve: {
+    tsconfigPaths: true,
+  },
   build: {
     assetsDir: "assets",
     // Set to true if you want sourcemaps in your build.

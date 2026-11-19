@@ -8,7 +8,9 @@ module ReactRouterRailsSpa
       def create_react_router_app
         say "Downloading React Router v7 ..."
         inside Rails.root do
-          run "npx create-react-router@latest frontend --yes --no-git-init"
+          # npx --yes avoids an interactive prompt when the package is not cached
+          # (important for CI and first-time installs).
+          run "npx --yes create-react-router@latest frontend --yes --no-git-init --no-agent-skills"
         end
       end
 

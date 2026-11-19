@@ -1,27 +1,75 @@
-name: Ruby
+name: CI
 
 on:
   push:
     branches:
       - main
-
   pull_request:
 
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
-  build:
+  # Unit tests + RuboCop for the gem itself.
+  gem:
     runs-on: ubuntu-latest
-    name: Ruby ${{ matrix.ruby }}
+    name: Gem (Ruby ${{ matrix.ruby }})
     strategy:
+      fail-fast: false
       matrix:
         ruby:
-          - '3.3.4'
+          - "3.2"
+          - "3.3"
+          - "3.4"
 
     steps:
       - uses: actions/checkout@v4
+
       - name: Set up Ruby
         uses: ruby/setup-ruby@v1
         with:
           ruby-version: ${{ matrix.ruby }}
           bundler-cache: true
-      - name: Run the default task
+
+      - name: Run tests and RuboCop
         run: bundle exec rake
+
+      - name: Build the gem package
+        run: gem build react_router_rails_spa.gemspec
+
+  # End-to-end smoke test: this gem is mostly an installer, so the valuable
+  # regression check is "fresh Rails app → generate → build SPA → serve /react/".
+  install_smoke:
+    runs-on: ubuntu-latest
+    name: Install smoke (Rails ${{ matrix.rails }} / Ruby ${{ matrix.ruby }})
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - ruby: "3.3"
+            rails: "8.0"
+          - ruby: "3.4"
+            rails: "8.0"
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: ${{ matrix.ruby }}
+          bundler-cache: true
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Install the target Rails version
+        run: gem install rails -v "~> ${{ matrix.rails }}.0" --no-document
+
+      - name: Run install smoke test
+        env:
+          INSTALL_SMOKE_WORKDIR: ${{ runner.temp }}/install_smoke
+        run: script/ci/install_smoke
