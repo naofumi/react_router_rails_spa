@@ -6,9 +6,8 @@ namespace :react_router do
   desc "Install npm packages for the React Router app"
   task :npm_install do
     puts "Installing npm packages ..."
-    Dir.chdir("#{Dir.pwd}/frontend") do
-      system("npm", "install")
-    end
+    success = system("npm", "install", chdir: "#{Dir.pwd}/frontend")
+    abort "❌ npm install failed" unless success
   end
 
   # Run bin/rails react_router:dev to start the dev server.
@@ -44,12 +43,16 @@ namespace :react_router do
   desc "Build React Router App and move to the public folder"
   task build: [ :npm_install ] do
     puts "Building React Router v7 app..."
-    `cd frontend && npm run build`
+    success = system("npm", "run", "build", chdir: "#{Dir.pwd}/frontend")
+    abort "❌ React Router build failed" unless success
 
     puts "Moving build files to public/react..."
-    `rm -rf public/react`
-    `mv frontend/build/client public/react`
-    `mv public/react/index.html public/react/react-router-rails-spa-index.html`
+    FileUtils.rm_rf("#{Dir.pwd}/public/react")
+    FileUtils.mv("#{Dir.pwd}/frontend/build/client", "#{Dir.pwd}/public/react")
+    FileUtils.mv(
+      "#{Dir.pwd}/public/react/index.html",
+      "#{Dir.pwd}/public/react/react-router-rails-spa-index.html"
+    )
 
     puts "✅ React app successfully built and deployed!"
   end
@@ -65,7 +68,7 @@ namespace :react_router do
   # Running bin/rails assets:clobber will also run this task.
   task :clobber do
     puts "Clobbering React Router v7 app build files..."
-    FileUtils.rm_rf("#{Dir.pwd}/public/react-router")
+    FileUtils.rm_rf("#{Dir.pwd}/public/react")
   end
 end
 

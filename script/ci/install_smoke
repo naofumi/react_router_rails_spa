@@ -1,0 +1,122 @@
+#!/usr/bin/env bash
+# Smoke-test the install generator against a fresh Rails app.
+#
+# This is the highest-signal CI check for this gem: most of the value is in
+# scaffolding a React Router SPA into Rails, so we exercise that path end-to-end
+# (rails new → install gem → generate → build frontend → boot /react/).
+set -euo pipefail
+
+ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
+WORKDIR="${INSTALL_SMOKE_WORKDIR:-${RUNNER_TEMP:-/tmp}/react_router_rails_spa_install_smoke}"
+APP_NAME="dummy_app"
+APP_DIR="${WORKDIR}/${APP_NAME}"
+SERVER_PID=""
+
+# Prefer a standalone `rails` on PATH (CI installs the matrix version via
+# `gem install`). Fall back to the gem development bundle for local runs.
+rails_new() {
+  if [[ -n "${RAILS_BIN:-}" ]]; then
+    "${RAILS_BIN}" new "$@"
+  elif command -v rails >/dev/null 2>&1; then
+    rails new "$@"
+  else
+    (cd "${ROOT}" && bundle exec rails new "$@")
+  fi
+}
+
+cleanup() {
+  if [[ -n "${SERVER_PID}" ]] && kill -0 "${SERVER_PID}" 2>/dev/null; then
+    kill "${SERVER_PID}" 2>/dev/null || true
+    wait "${SERVER_PID}" 2>/dev/null || true
+  fi
+}
+trap cleanup EXIT
+
+echo "==> Preparing workdir at ${WORKDIR}"
+rm -rf "${WORKDIR}"
+mkdir -p "${WORKDIR}"
+
+echo "==> Creating a fresh Rails application"
+cd "${WORKDIR}"
+rails_new "${APP_NAME}" \
+  --database=sqlite3 \
+  --skip-git \
+  --skip-docker \
+  --skip-action-mailer \
+  --skip-action-mailbox \
+  --skip-action-text \
+  --skip-active-storage \
+  --skip-action-cable \
+  --skip-hotwire \
+  --skip-jbuilder \
+  --skip-test \
+  --skip-system-test \
+  --skip-bootsnap \
+  --skip-dev-gems \
+  --skip-thruster \
+  --skip-rubocop \
+  --skip-brakeman \
+  --skip-ci \
+  --skip-kamal \
+  --skip-solid \
+  --skip-devcontainer \
+  --quiet
+
+cd "${APP_DIR}"
+
+echo "==> Installing react_router_rails_spa from the local checkout"
+bundle add react_router_rails_spa --path "${ROOT}"
+
+echo "==> Running react_router_rails_spa:install"
+bin/rails generate react_router_rails_spa:install --force
+
+echo "==> Asserting generated Rails and frontend files"
+test -f app/controllers/react_controller.rb
+test -f lib/tasks/react.rake
+test -f frontend/package.json
+test -f frontend/react-router.config.ts
+test -f frontend/vite.config.ts
+test -f frontend/app/routes/home.tsx
+test -f frontend/app/utilities/csrf.ts
+test -f frontend/app/utilities/proxy.ts
+grep -q 'react#show' config/routes.rb
+grep -q 'ReactRouterRailsSpa::CsrfCookieEnabled' app/controllers/react_controller.rb
+grep -q 'basename: "/react/"' frontend/react-router.config.ts
+
+echo "==> Building the React Router SPA into public/react"
+# Use production env so the generated Vite config disables sourcemaps,
+# matching assets:precompile / deploy behavior.
+RAILS_ENV=production bin/rails react_router:build
+test -f public/react/react-router-rails-spa-index.html
+test -d public/react/assets
+
+echo "==> Preparing the database and booting Rails"
+bin/rails db:prepare
+bin/rails server -p 3000 -b 127.0.0.1 >"${WORKDIR}/rails-server.log" 2>&1 &
+SERVER_PID=$!
+
+echo "==> Waiting for Rails to accept connections"
+for _ in $(seq 1 60); do
+  if curl -sf "http://127.0.0.1:3000/up" >/dev/null; then
+    break
+  fi
+  if ! kill -0 "${SERVER_PID}" 2>/dev/null; then
+    echo "Rails server exited early. Log:"
+    cat "${WORKDIR}/rails-server.log"
+    exit 1
+  fi
+  sleep 1
+done
+
+echo "==> Requesting the React bootstrap endpoint"
+RESPONSE="$(mktemp)"
+HTTP_CODE="$(curl -sS -o "${RESPONSE}" -w "%{http_code}" "http://127.0.0.1:3000/react/")"
+test "${HTTP_CODE}" = "200"
+grep -qi '<html' "${RESPONSE}"
+
+# CSRF cookie should be set by ReactController via CsrfCookieEnabled.
+HEADERS="$(mktemp)"
+curl -sS -D "${HEADERS}" -o /dev/null "http://127.0.0.1:3000/react/"
+grep -qi 'X-CSRF-Token' "${HEADERS}"
+
+echo "✅ Install smoke test passed"
