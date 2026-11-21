@@ -11,4 +11,6 @@ gem "minitest", "~> 5.16"
 
 gem "rubocop", "~> 1.21"
 
-gem "rails", ">= 8.0.2"
+# 8.0 is out of security support (ended 2026-11-07). Stay on the 8.1 line,
+# at or above the 8.1.4.1 security release.
+gem "rails", ">= 8.1.4.1", "< 8.2"
